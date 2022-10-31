@@ -162,13 +162,25 @@ def pairSelection(population, scores, popSize):
     list
         parent2: The second parent individual of the pair
     """
-    parent1Id = rouletteWheelSelectionId(scores, popSize)
-    parent1 = population[parent1Id].copy()
+# =============================================================================
+#     parent1Id = rouletteWheelSelectionId(scores, popSize)
+#     parent1 = population[parent1Id].copy()
+# 
+#     parent2Id = rouletteWheelSelectionId(scores, popSize)
+#     parent2 = population[parent2Id].copy()
+# =============================================================================
 
-    parent2Id = rouletteWheelSelectionId(scores, popSize)
-    parent2 = population[parent2Id].copy()
+    return tournamentSelection(50, popSize, population, objf)
 
-    return parent1, parent2
+def tournamentSelection(selection, popSize, population, objf):
+    best1 = None
+    best2 = None
+    for i in range(selection):
+        individual = random.choice(population)
+        if ((best1 == None) or (objf(individual) > objf(best1))):
+            best2 = best1
+            best1 = individual
+    return best1, best2
 
 
 def rouletteWheelSelectionId(scores, popSize):
@@ -525,7 +537,7 @@ def read(objf, lb, ub, dim, popSize, iters, ga):
     for l in range(iters):
 
         # crossover
-        ga= crossoverPopulaton(ga, scores, popSize, cp, keep)
+        ga = crossoverPopulaton(ga, scores, popSize, cp, keep)
 
         # mutation
         mutatePopulaton(ga, popSize, mp, keep, lb, ub)
