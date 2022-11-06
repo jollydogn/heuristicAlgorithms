@@ -141,8 +141,8 @@ def selectWorstIndividual(scores):
     maxFitnessId = maxFitnessId[0][0]
     return maxFitnessId
 
-
-def pairSelection(population, scores, popSize):
+## mod:selection type ==> (0:roulette_wheel, 1:tournament_selection)
+def pairSelection(population, scores, popSize, mod):
     """
     This is used to select one pair of parents using roulette Wheel Selection mechanism
 
@@ -162,6 +162,14 @@ def pairSelection(population, scores, popSize):
     list
         parent2: The second parent individual of the pair
     """
+    # if mod==0:
+    #     parent1Id = rouletteWheelSelectionId(scores, popSize)
+    #     parent1 = population[parent1Id].copy()
+    #     parent2Id = rouletteWheelSelectionId(scores, popSize)
+    #     parent2 = population[parent2Id].copy()
+    # else
+    #     return tournamentSelection(50,popSize,population, objf)
+
 # =============================================================================
 #     parent1Id = rouletteWheelSelectionId(scores, popSize)
 #     parent1 = population[parent1Id].copy()
