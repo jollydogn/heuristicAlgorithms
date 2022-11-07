@@ -31,7 +31,8 @@ def selectFunction(cbIndex):
         14: ellipse,
         15: nesterov,
         16: saddle,
-        17: custom
+        17: damavandi,
+        18: custom
     }
         return switcher.get(cbIndex, "nothing")
 
@@ -182,3 +183,11 @@ def saddle( x ):
     x = np.asarray_chkfinite(x) - 1
     return np.mean( np.diff( x **2 )) \
         + .5 * np.mean( x **4 )
+
+#...............................................................................      
+def damavandi(x):
+    # Range: [0,14] in each dimension
+    # Global minimum at (2,2)
+    x1,x2 = x[0], x[1]
+    y1,y2 = np.pi*(x1-2), np.pi*(x2-2)
+    return ( 1 - abs( np.sin(y1)*np.sin(y2) / (y1*y2) )**5 ) * (2 + (x1-7)**2 + 2*(x2-7)**2)

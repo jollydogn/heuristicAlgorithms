@@ -12,7 +12,7 @@ import time
 
 
 def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter, decrease_From=2):
-
+    ret_score=0
     # Max_iter=1000
     # lb=-100
     # ub=100
@@ -130,6 +130,7 @@ def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter, decrease_From=2):
                 Positions[i, j] = (X1 + X2 + X3) / 3  # Equation (3.7)
 
         Convergence_curve[l] = Alpha_score
+        ret_score=Alpha_score
 
         if l % 1 == 0:
             print(
@@ -143,4 +144,4 @@ def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter, decrease_From=2):
     s.optimizer = "GWO"
     s.objfname = objf.__name__
 
-    return s
+    return s, ret_score
