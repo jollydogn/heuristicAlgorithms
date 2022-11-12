@@ -55,7 +55,7 @@ def boundary_check(value, lb, ub):
     return value
 
 
-def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub):
+def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub,obj_f):
     """
     The main function of the HS
     :param hms: harmony memory size
@@ -75,10 +75,10 @@ def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub):
     for i in range(hms):
         temp_pos = [random.uniform(lb[j], ub[j]) for j in range(dim)]
         pos.append(temp_pos)
-        score.append(obj(temp_pos))
+        score.append(obj_f(temp_pos))
     iter_best = []
     gbest = min(score)  # the score of the best-so-far harmony
-    gbest_pos = pos[score.index(gbest)].copy()  # the best-so-far harmony
+    gbest_pos = pos[score.index(gbest)]  # the best-so-far harmony
     con_iter = 0
 
     # Step 2. The main loop
@@ -99,7 +99,7 @@ def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub):
                     temp_pos.append(random.uniform(lb[j], ub[j]))
             temp_pos = boundary_check(temp_pos, lb, ub)
             new_pos.append(temp_pos)
-            new_score.append(obj(temp_pos))
+            new_score.append(obj_f(temp_pos))
 
         # Step 2.2. Update harmony memory
         new_pos.extend(pos)
@@ -114,18 +114,18 @@ def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub):
         # Step 2.3. Update the global best
         if score[0] < gbest:
             gbest = score[0]
-            gbest_pos = pos[0].copy()
+            gbest_pos = pos[0]
             con_iter = t + 1
         iter_best.append(gbest)
 
     # Step 3. Sort the results
     x = [i for i in range(iter)]
-    plt.figure()
-    plt.plot(x, iter_best, linewidth=2, color='blue')
-    plt.xlabel('Iteration number')
-    plt.ylabel('Global optimal value')
-    plt.title('Convergence curve')
-    plt.show()
+    # plt.figure()
+    # plt.plot(x, iter_best, linewidth=2, color='blue')
+    # plt.xlabel('Iteration number')
+    # plt.ylabel('Global optimal value')
+    # plt.title('Convergence curve')
+    # plt.show()
     return {'best score': gbest, 'best solution': gbest_pos, 'convergence iteration': con_iter}
 
 def allocateObjectiveFunctions():
@@ -143,17 +143,44 @@ def bounds(function_num,dimension):
     return lower_bounds, upper_bounds
     
 def optimize():
-    hms = [250,500,1000,5000,10000]
-    bw=[0.1, 0.15, 0.2, 0.25, 0.30]
-    hmcr=[0.90,0.92, 0.95, 0.97, 0.99]
-    par=[0.15,0.2,0.25,0.3,0.35,0.4]
+    # hms_param = [250,500,1000,5000,10000]
+    # bw_param=[0.1, 0.15, 0.2, 0.25, 0.30]
+    # hmcr_param=[0.90,0.92, 0.95, 0.97, 0.99]
+    # par_param=[0.15,0.2,0.25,0.3,0.35,0.4]
+
+    hms_param = [250]
+    bw_param=[0.1]
+    hmcr_param=[0.90]
+    par_param=[0.15,0.2]
     iter=1000
     nnew=20
-    lb,ub=bounds(1,30)
-
+    obj_functions =allocateObjectiveFunctions()
+    o_functions=obj_functions[:2]
+    results=[]
     dfs = [pd.DataFrame()] * 9
-    print(harmonySearch(hms[0], iter, hmcr[0], par[0], bw[0], nnew, lb, ub))
+    #print(harmonySearch(hms[0], iter, hmcr[0], par[0], bw[0], nnew, lb, ub))
     # def harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub):
+    for idx,obj_f in enumerate(o_functions):
+        lb,ub=bounds(idx,4)
+        for hms_idx,hms in enumerate(hms_param):
+            for bw_idx,bw in enumerate(bw_param):
+                for hmcr_idx,hmcr in enumerate(hmcr_param):
+                    for par_idx,par in enumerate(par_param):
+                        for _ in range(5):
+                            best=harmonySearch(hms, iter, hmcr, par, bw, nnew, lb, ub,obj_f)
+                            results.append([obj_f.__name__,hms,iter,hmcr,par,bw,nnew,lb[0],ub[0],best['best score']])
+                            print(best['best score'])
+                    df=pd.DataFrame(results,columns=['obj_f','hms','iter','hmcr','par','bw','nnew','lb','ub','best'])
+                    df['std_dev'] = df['best'].rolling(5).std()
+                    df['avg_fitness']=df['best'].rolling(5).mean()
+                    df['max_fitness']=df['best'].rolling(5).min()
+                    print(df)
+                    dfs[idx]=df
+                results=[]
+    with pd.ExcelWriter('output.xlsx') as writer:
+        for idx,df in enumerate(dfs):
+            dfs[idx].to_excel(writer, sheet_name=obj_functions[idx].__name__)
+
 
 
 def main():
