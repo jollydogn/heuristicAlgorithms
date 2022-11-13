@@ -10,8 +10,10 @@ import sys
 
 from solution import solution
 
-
-def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep):
+## type = 0: normal crossover
+## type = 1: uniform crossover
+## type = 2: two point crossover
+def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep,crossoverType, selectionType):
     """
     The crossover of all individuals
 
@@ -33,31 +35,68 @@ def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep):
     -------
     N/A
     """
-    # initialize a new population
+    # # initialize a new population
+    # newPopulation = numpy.empty_like(population)
+    # newPopulation[0:keep] = population[0:keep]
+    # # Create pairs of parents. The number of pairs equals the number of individuals divided by 2
+    # for i in range(keep, popSize, 2):
+    #     # pair of parents selection
+    #     parent1, parent2 = pairSelection(population, scores, popSize)
+    #     print("Parent 1  :" , parent1)
+    #     print("Parent 2 :" , parent2)
+    #     individualLength = min(len(parent1), len(parent2))
+    #     parentsCrossoverProbability = random.uniform(0.0, 1.0)
+    #     mask = numpy.random.randint(2,size=len(parent2))
+    #     if parentsCrossoverProbability < crossoverProbability:
+    #         offspring1, offspring2 = uniformCrossover(mask, parent1, parent2)
+    #     else:
+    #         offspring1 = parent1.copy()
+    #         offspring2 = parent2.copy()
+    #     print("OffSpring 1 : " , offspring1)
+    #     print("OffSpring 2 : ", offspring2)
+    #     print(" Mask" , mask)
+
+    #     # Add offsprings to population
+    #     newPopulation[i] = numpy.copy(offspring1)
+    #     newPopulation[i + 1] = numpy.copy(offspring2)
+        
+    # return newPopulation
+
     newPopulation = numpy.empty_like(population)
     newPopulation[0:keep] = population[0:keep]
     # Create pairs of parents. The number of pairs equals the number of individuals divided by 2
     for i in range(keep, popSize, 2):
         # pair of parents selection
-        parent1, parent2 = pairSelection(population, scores, popSize)
-        print("Parent 1  :" , parent1)
-        print("Parent 2 :" , parent2)
-        individualLength = min(len(parent1), len(parent2))
+        parent1, parent2 = pairSelection(population, scores, popSize, selectionType)
+        crossoverLength = min(len(parent1), len(parent2))
         parentsCrossoverProbability = random.uniform(0.0, 1.0)
-        mask = numpy.random.randint(2,size=len(parent2))
         if parentsCrossoverProbability < crossoverProbability:
-            offspring1, offspring2 = uniformCrossover(mask, parent1, parent2)
+            if(crossoverType==0):
+                offspring1, offspring2 = crossover(crossoverLength, parent1, parent2)
+            elif(crossoverType==1):
+                mask = numpy.random.rand(crossoverLength)
+                offspring1, offspring2 = uniformCrossover(parent1,parent2,mask)
+                print("Parent1:",parent1)
+                print("Parent2:",parent2)
+                print("Mask:",mask)
+                print("Offspring 1:",offspring1)
+                print("Offspring 2:",offspring2)
+            elif(crossoverType==2):
+                offspring1, offspring2 = twopointcrossover(crossoverLength, parent1, parent2)
+                print("Parent1:",parent1)
+                print("Parent2:",parent2)
+                print("Offspring 1:",offspring1)
+                print("Offspring 2:",offspring2)
         else:
             offspring1 = parent1.copy()
             offspring2 = parent2.copy()
-        print("OffSpring 1 : " , offspring1)
-        print("OffSpring 2 : ", offspring2)
-        print(" Mask" , mask)
+
+
 
         # Add offsprings to population
         newPopulation[i] = numpy.copy(offspring1)
         newPopulation[i + 1] = numpy.copy(offspring2)
-        
+
     return newPopulation
 
 
@@ -142,7 +181,7 @@ def selectWorstIndividual(scores):
     return maxFitnessId
 
 ## mod:selection type ==> (0:roulette_wheel, 1:tournament_selection)
-def pairSelection(population, scores, popSize, mod):
+def pairSelection(population, scores, popSize, selectionType):
     """
     This is used to select one pair of parents using roulette Wheel Selection mechanism
 
@@ -162,13 +201,19 @@ def pairSelection(population, scores, popSize, mod):
     list
         parent2: The second parent individual of the pair
     """
-    # if mod==0:
-    #     parent1Id = rouletteWheelSelectionId(scores, popSize)
-    #     parent1 = population[parent1Id].copy()
-    #     parent2Id = rouletteWheelSelectionId(scores, popSize)
-    #     parent2 = population[parent2Id].copy()
-    # else
-    #     return tournamentSelection(50,popSize,population, objf)
+    
+    if(selectionType==0):
+        parent1Id = rouletteWheelSelectionId(scores, popSize)
+        parent1 = population[parent1Id].copy()
+        parent2Id = rouletteWheelSelectionId(scores, popSize)
+        parent2 = population[parent2Id].copy()
+        return parent1, parent2
+    elif(selectionType==1):
+        sampleSize=int(popSize/2)
+        parent1Id,parent2Id=tournamentSelection(sampleSize,popSize,scores)
+        parent1=population[parent1Id]
+        parent2=population[parent2Id]
+        return parent1,parent2
 
 # =============================================================================
 #     parent1Id = rouletteWheelSelectionId(scores, popSize)
@@ -178,17 +223,19 @@ def pairSelection(population, scores, popSize, mod):
 #     parent2 = population[parent2Id].copy()
 # =============================================================================
 
-    return tournamentSelection(50, popSize, population, objf)
+    #return tournamentSelection(50, popSize, population, objf)
 
-def tournamentSelection(selection, popSize, population, objf):
-    best1 = None
-    best2 = None
-    for i in range(selection):
-        individual = random.choice(population)
-        if ((best1 == None) or (objf(individual) > objf(best1))):
-            best2 = best1
-            best1 = individual
-    return best1, best2
+def tournamentSelection(sampleSize, popSize, scores):
+    bestId = None
+    secondBestId = None
+    bestScore,secondBestScore=None
+    for i in range(sampleSize):
+        individualIndex = random.randint(0,popSize-1)
+        
+        if ((bestId == None) or (scores[individualIndex] > scores[bestId])):
+            secondBestId = bestId
+            bestId = individualIndex
+    return bestId, secondBestId
 
 
 def rouletteWheelSelectionId(scores, popSize):
@@ -268,15 +315,13 @@ def twopointcrossover(individualLength, parent1, parent2):
 
     return offspring1, offspring2
 
-def uniformCrossover(individualLength, parent1, parent2):
-    counter=0
-    for i in individualLength:
-        if i < 0.5:
-            temp=parent1[counter]
-            parent1[counter]=parent2[counter]
-            parent2[counter]=temp
-        counter=counter + 1
-    return parent2, parent1
+def uniformCrossover(parent1, parent2, mask):
+    for i in range(len(mask)):
+        if mask[i]<0.5:
+            temp=parent1[i]
+            parent1[i]=parent2[i]
+            parent2[i]=temp
+    return parent1,parent2
 
 def mutation(offspring, individualLength, lb, ub):
     """
@@ -398,7 +443,7 @@ def sortPopulation(population, scores):
     return population, scores
 
 
-def GA(objf, lb, ub, dim, popSize, iters):
+def GA(objf, lb, ub, dim, popSize, iters,mut_prob,crossoverType,selectionType):
 
     """
     This is the main method which implements GA
@@ -425,7 +470,7 @@ def GA(objf, lb, ub, dim, popSize, iters):
     """
 
     cp = 1  # crossover Probability
-    mp = 0.01  # Mutation Probability
+    mp = mut_prob  # Mutation Probability
     keep = 2
     # elitism parameter: how many of the best individuals to keep from one generation to the next
 
@@ -453,7 +498,7 @@ def GA(objf, lb, ub, dim, popSize, iters):
     for l in range(iters):
 
         # crossover
-        ga = crossoverPopulaton(ga, scores, popSize, cp, keep)
+        ga = crossoverPopulaton(ga, scores, popSize, cp, keep, crossoverType,selectionType)
 
         # mutation
         mutatePopulaton(ga, popSize, mp, keep, lb, ub)
@@ -493,7 +538,7 @@ def GA(objf, lb, ub, dim, popSize, iters):
 
 
 
-def read(objf, lb, ub, dim, popSize, iters, ga):
+def read(objf, lb, ub, dim, popSize, iters, ga,mut_prob,crossoverType,selectionType):
 
     """
     This is the main method which implements GA
@@ -520,7 +565,7 @@ def read(objf, lb, ub, dim, popSize, iters, ga):
     """
 
     cp = 1  # crossover Probability
-    mp = 0.01  # Mutation Probability
+    mp = mut_prob  # Mutation Probability
     keep = 2
     # elitism parameter: how many of the best individuals to keep from one generation to the next
 
@@ -545,7 +590,7 @@ def read(objf, lb, ub, dim, popSize, iters, ga):
     for l in range(iters):
 
         # crossover
-        ga = crossoverPopulaton(ga, scores, popSize, cp, keep)
+        ga = crossoverPopulaton(ga, scores, popSize, cp, keep,crossoverType,selectionType)
 
         # mutation
         mutatePopulaton(ga, popSize, mp, keep, lb, ub)
