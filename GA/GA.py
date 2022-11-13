@@ -75,10 +75,10 @@ def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep,c
                 offspring1, offspring2 = crossover(crossoverLength, parent1, parent2)
             elif(crossoverType==1):
                 mask = numpy.random.rand(crossoverLength)
-                offspring1, offspring2 = uniformCrossover(parent1,parent2,mask)
                 print("Parent1:",parent1)
                 print("Parent2:",parent2)
                 print("Mask:",mask)
+                offspring1, offspring2 = uniformCrossoverQ(parent1,parent2,mask)
                 print("Offspring 1:",offspring1)
                 print("Offspring 2:",offspring2)
             elif(crossoverType==2):
@@ -87,6 +87,7 @@ def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep,c
                 print("Parent2:",parent2)
                 print("Offspring 1:",offspring1)
                 print("Offspring 2:",offspring2)
+        
         else:
             offspring1 = parent1.copy()
             offspring2 = parent2.copy()
@@ -315,13 +316,13 @@ def twopointcrossover(individualLength, parent1, parent2):
 
     return offspring1, offspring2
 
-def uniformCrossover(parent1, parent2, mask):
-    for i in range(len(mask)):
-        if mask[i]<0.5:
-            temp=parent1[i]
-            parent1[i]=parent2[i]
-            parent2[i]=temp
-    return parent1,parent2
+def uniformCrossoverQ(parent1, parent2, mask):
+    offspring1=parent1
+    offspring2=parent2
+    for idx,bit in enumerate(mask):
+        if(mask[idx]<0.5):
+            offspring1[idx],offspring2[idx]=offspring2[idx],offspring1[idx]
+    return offspring1,offspring2
 
 def mutation(offspring, individualLength, lb, ub):
     """

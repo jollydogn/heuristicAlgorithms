@@ -10,7 +10,7 @@ def GeneticAlgorithm():
     pop_size = 250 # population size
     maxiter = 250
     obj_func = functions.selectFunction(Functions.schwefel)
-    sol = GA.GA(obj_func, _lb, _ub, dim, pop_size, maxiter,0.0001,2,0)
+    sol = GA.GA(obj_func, _lb, _ub, dim, pop_size, maxiter,0.0001,1,0)
     return sol
 
 # def GeneticAlgorithm():
