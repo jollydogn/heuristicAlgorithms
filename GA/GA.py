@@ -124,6 +124,7 @@ def mutatePopulaton(population, popSize, mutationProbability, keep, lb, ub):
     -------
     N/A
     """
+
     for i in range(keep, popSize):
         # Mutation
       
@@ -229,13 +230,15 @@ def pairSelection(population, scores, popSize, selectionType):
 def tournamentSelection(sampleSize, popSize, scores):
     bestId = None
     secondBestId = None
-    bestScore,secondBestScore=None
-    for i in range(sampleSize):
+    #bestScore,secondBestScore=None
+    for _ in range(sampleSize):
         individualIndex = random.randint(0,popSize-1)
-        
-        if ((bestId == None) or (scores[individualIndex] > scores[bestId])):
-            secondBestId = bestId
-            bestId = individualIndex
+        if((bestId==None)):
+            bestId=individualIndex
+            secondBestId=individualIndex
+        elif (scores[individualIndex] < scores[bestId]):
+            secondBestId=bestId
+            bestId = individualIndex  
     return bestId, secondBestId
 
 
@@ -566,7 +569,7 @@ def read(objf, lb, ub, dim, popSize, iters, ga,mut_prob,crossoverType,selectionT
     """
 
     cp = 1  # crossover Probability
-    mp = mut_prob  # Mutation Probability
+    mp = float(mut_prob)  # Mutation Probability
     keep = 2
     # elitism parameter: how many of the best individuals to keep from one generation to the next
 
