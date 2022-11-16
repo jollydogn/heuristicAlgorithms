@@ -31,8 +31,9 @@ def selectFunction(cbIndex):
         14: ellipse,
         15: nesterov,
         16: saddle,
-        17: damavandi,
-        18: custom
+        17:damavandi,
+        18:rotatedhyperellipsoid,
+        19: custom
     }
         return switcher.get(cbIndex, "nothing")
 
@@ -183,7 +184,7 @@ def saddle( x ):
     x = np.asarray_chkfinite(x) - 1
     return np.mean( np.diff( x **2 )) \
         + .5 * np.mean( x **4 )
-
+        
 #...............................................................................      
 def damavandi(x):
     # Range: [0,14] in each dimension
@@ -191,3 +192,16 @@ def damavandi(x):
     x1,x2 = x[0], x[1]
     y1,y2 = np.pi*(x1-2), np.pi*(x2-2)
     return ( 1 - abs( np.sin(y1)*np.sin(y2) / (y1*y2) )**5 ) * (2 + (x1-7)**2 + 2*(x2-7)**2)
+
+#...............................................................................  
+def rotatedhyperellipsoid ( x ):
+  f = np.zeros ( len(x) )
+  outer = 0.0
+  for i in range ( 0, len(f) ):
+    inner = 0.0
+    for j in range ( 0, i ):
+        xj = x[j]
+        inner = inner + pow(xj,2)
+    outer = outer + inner
+  f = outer
+  return f

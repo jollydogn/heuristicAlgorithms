@@ -35,33 +35,6 @@ def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep,c
     -------
     N/A
     """
-    # # initialize a new population
-    # newPopulation = numpy.empty_like(population)
-    # newPopulation[0:keep] = population[0:keep]
-    # # Create pairs of parents. The number of pairs equals the number of individuals divided by 2
-    # for i in range(keep, popSize, 2):
-    #     # pair of parents selection
-    #     parent1, parent2 = pairSelection(population, scores, popSize)
-    #     print("Parent 1  :" , parent1)
-    #     print("Parent 2 :" , parent2)
-    #     individualLength = min(len(parent1), len(parent2))
-    #     parentsCrossoverProbability = random.uniform(0.0, 1.0)
-    #     mask = numpy.random.randint(2,size=len(parent2))
-    #     if parentsCrossoverProbability < crossoverProbability:
-    #         offspring1, offspring2 = uniformCrossover(mask, parent1, parent2)
-    #     else:
-    #         offspring1 = parent1.copy()
-    #         offspring2 = parent2.copy()
-    #     print("OffSpring 1 : " , offspring1)
-    #     print("OffSpring 2 : ", offspring2)
-    #     print(" Mask" , mask)
-
-    #     # Add offsprings to population
-    #     newPopulation[i] = numpy.copy(offspring1)
-    #     newPopulation[i + 1] = numpy.copy(offspring2)
-        
-    # return newPopulation
-
     newPopulation = numpy.empty_like(population)
     newPopulation[0:keep] = population[0:keep]
     # Create pairs of parents. The number of pairs equals the number of individuals divided by 2
@@ -87,19 +60,15 @@ def crossoverPopulaton(population, scores, popSize, crossoverProbability, keep,c
                 print("Parent2:",parent2)
                 print("Offspring 1:",offspring1)
                 print("Offspring 2:",offspring2)
-        
         else:
             offspring1 = parent1.copy()
             offspring2 = parent2.copy()
-
-
 
         # Add offsprings to population
         newPopulation[i] = numpy.copy(offspring1)
         newPopulation[i + 1] = numpy.copy(offspring2)
 
     return newPopulation
-
 
 def mutatePopulaton(population, popSize, mutationProbability, keep, lb, ub):
     """
@@ -127,7 +96,6 @@ def mutatePopulaton(population, popSize, mutationProbability, keep, lb, ub):
 
     for i in range(keep, popSize):
         # Mutation
-      
         offspringMutationProbability = random.uniform(0.0, 1.0)
         if offspringMutationProbability < mutationProbability:
             print("Before Mutation : " ,population[i])
@@ -216,16 +184,6 @@ def pairSelection(population, scores, popSize, selectionType):
         parent1=population[parent1Id]
         parent2=population[parent2Id]
         return parent1,parent2
-
-# =============================================================================
-#     parent1Id = rouletteWheelSelectionId(scores, popSize)
-#     parent1 = population[parent1Id].copy()
-# 
-#     parent2Id = rouletteWheelSelectionId(scores, popSize)
-#     parent2 = population[parent2Id].copy()
-# =============================================================================
-
-    #return tournamentSelection(50, popSize, population, objf)
 
 def tournamentSelection(sampleSize, popSize, scores):
     bestId = None
@@ -384,7 +342,6 @@ def clearDups(Population, lb, ub):
         )
 
     return newPopulation
-
 
 def calculateCost(objf, population, popSize, lb, ub):
 

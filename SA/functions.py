@@ -194,11 +194,14 @@ def damavandi(x):
     return ( 1 - abs( np.sin(y1)*np.sin(y2) / (y1*y2) )**5 ) * (2 + (x1-7)**2 + 2*(x2-7)**2)
 
 #...............................................................................  
-def rotatedhyperellipsoid ( m, n, x ):
-  f = np.zeros ( n )
-  for j in range ( 0, n ):
-    x_sum = 0.0
-    for i in range ( 0, m ):
-      x_sum = x_sum + x[i,j]
-      f[j] = f[j] + x_sum ** 2
+def rotatedhyperellipsoid ( x ):
+  f = np.zeros ( len(x) )
+  outer = 0.0
+  for i in range ( 0, len(f) ):
+    inner = 0.0
+    for j in range ( 0, i ):
+        xj = x[j]
+        inner = inner + pow(xj,2)
+    outer = outer + inner
+  f = outer
   return f
