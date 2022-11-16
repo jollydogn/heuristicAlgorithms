@@ -6,18 +6,12 @@ Created on Mon May 16 00:27:50 2016
 
 import random
 import numpy
-import math
 from solution import solution
 import time
 
 
 def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter, decrease_From=2):
     ret_score=0
-    # Max_iter=1000
-    # lb=-100
-    # ub=100
-    # dim=30
-    # SearchAgents_no=5
 
     # initialize alpha, beta, and delta_pos
     Alpha_pos = numpy.zeros(dim)

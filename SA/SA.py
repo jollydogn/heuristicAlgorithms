@@ -55,34 +55,6 @@ def update_solution(guess, epson, min_values = [-5,-5], max_values = [5,5], targ
     return updated_solution
 
 ############################################################################
-
-# SA Function
-# def simulated_annealing(min_values = [-5,-5], max_values = [5,5], mu = 0, sigma = 1, initial_temperature = 1.0, temperature_iterations = 1000, final_temperature = 0.0001, alpha = 0.9, target_function = target_function, verbose = True):    
-#     guess = initial_guess(min_values = min_values, max_values = max_values, target_function = target_function)
-#     epson = epson_vector(guess, mu = mu, sigma = sigma)
-#     best  = np.copy(guess)
-#     fx_best = guess[0,-1]
-#     Temperature = float(initial_temperature)
-#     while (Temperature > final_temperature): 
-#         for repeat in range(0, temperature_iterations):
-#             if (verbose == True):
-#                 print('Temperature = ', round(Temperature, 4), ' ; iteration = ', repeat, ' ; f(x) = ', round(best[0, -1], 4))
-#             fx_old    =  guess[0,-1]    
-#             epson     = epson_vector(guess, mu = mu, sigma = sigma)
-#             new_guess = update_solution(guess, epson, min_values = min_values, max_values = max_values, target_function = target_function)
-#             fx_new    = new_guess[0,-1] 
-#             delta     = (fx_new - fx_old)
-#             r         = int.from_bytes(os.urandom(8), byteorder = "big") / ((1 << 64) - 1)
-#             p         = np.exp(-delta/Temperature)
-#             print(best)
-#             if (delta < 0 or r <= p):
-#                 guess = np.copy(new_guess)   
-#             if (fx_new < fx_best):
-#                 fx_best = fx_new
-#                 best    = np.copy(guess)
-#         Temperature = alpha*Temperature   
-#         return best
-
 # SA Geometrik
 def simulated_annealing_geometric(min_values = [-5,-5], max_values = [5,5], mu = 0, sigma = 1, initial_temperature = None, temperature_iterations = 1000, final_temperature = 0.0001, alpha = 0.9, target_function = target_function, verbose = True):    
     guess = initial_guess(min_values = min_values, max_values = max_values, target_function = target_function)
