@@ -1,17 +1,18 @@
 import numpy as np
 from numpy import sin, cos, tan ,cosh, tanh, sinh, abs, exp, mean, pi, prod, sqrt, sum
+from numba import jit, cuda
 
 function = "sum(x**2)"
 
 
-
+@jit(target ="cuda")
 def createFunction(f):
     function = f
-
+@jit(target ="cuda")
 def custom(x):
     x = np.asarray_chkfinite(x)
     return eval(function)
-
+@jit(target ="cuda")
 def selectFunction(cbIndex):
         switcher = {
         0: ackley,
@@ -36,7 +37,7 @@ def selectFunction(cbIndex):
         19: custom
     }
         return switcher.get(cbIndex, "nothing")
-
+@jit(target ="cuda")
 def ackley( x, a=20, b=0.2, c=2*pi ):
     x = np.asarray_chkfinite(x)  # ValueError if any NaN or Inf
     n = len(x)
@@ -45,6 +46,7 @@ def ackley( x, a=20, b=0.2, c=2*pi ):
     return -a*exp( -b*sqrt( s1 / n )) - exp( s2 / n ) + a + exp(1)
 
 #...............................................................................
+@jit(target ="cuda")
 def dixonprice( x ):  # dp.m
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -53,6 +55,7 @@ def dixonprice( x ):  # dp.m
     return sum( j * (x2[1:] - x[:-1]) **2 ) + (x[0] - 1) **2
 
 #...............................................................................
+@jit(target ="cuda")
 def griewank( x, fr=4000 ):
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -62,6 +65,7 @@ def griewank( x, fr=4000 ):
     return s/fr - p + 1
 
 #...............................................................................
+@jit(target ="cuda")
 def levy( x ):
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -72,7 +76,7 @@ def levy( x ):
 
 #...............................................................................
 michalewicz_m = .5  # orig 10: ^20 => underflow
-
+@jit(target ="cuda")
 def michalewicz( x ):  # mich.m
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -80,6 +84,7 @@ def michalewicz( x ):  # mich.m
     return - sum( sin(x) * sin( j * x**2 / pi ) ** (2 * michalewicz_m) )
 
 #...............................................................................
+@jit(target ="cuda")
 def perm( x, b=.5 ):
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -92,6 +97,7 @@ def perm( x, b=.5 ):
     #       for k in j ])
 
 #...............................................................................
+@jit(target ="cuda")
 def powell( x ):
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -107,6 +113,7 @@ def powell( x ):
     return sum( f**2 )
 
 #...............................................................................
+@jit(target ="cuda")
 def powersum( x, b=[8,18,44,114] ):  # power.m
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -116,13 +123,17 @@ def powersum( x, b=[8,18,44,114] ):  # power.m
         s += (sum( x**k ) - bk) **2  # dim 10 huge, 100 overflows
     return s
 
+
 #...............................................................................
+@jit(target ="cuda")
 def rastrigin( x ):  # rast.m
     x = np.asarray_chkfinite(x)
     n = len(x)
     return 10*n + sum( x**2 - 10 * cos( 2 * pi * x ))
 
+
 #...............................................................................
+@jit(target ="cuda")
 def rosenbrock( x ):  # rosen.m
     """ http://en.wikipedia.org/wiki/Rosenbrock_function """
         # a sum of squares, so LevMar (scipy.optimize.leastsq) is pretty good
@@ -133,17 +144,20 @@ def rosenbrock( x ):  # rosen.m
         + 100 * sum( (x1 - x0**2) **2 ))
 
 #...............................................................................
+@jit(target ="cuda")
 def schwefel( x ):  # schw.m
     x = np.asarray_chkfinite(x)
     n = len(x)
     return 418.9829*n - sum( x * sin( sqrt( abs( x ))))
 
 #...............................................................................
+@jit(target ="cuda")
 def sphere( x ):
     x = np.asarray_chkfinite(x)
     return sum( x**2 )
 
 #...............................................................................
+@jit(target ="cuda")
 def sum2( x ):
     x = np.asarray_chkfinite(x)
     n = len(x)
@@ -151,10 +165,11 @@ def sum2( x ):
     return sum( j * x**2 )
 
 #...............................................................................
+@jit(target ="cuda")
 def trid( x ):
     x = np.asarray_chkfinite(x)
     return sum( (x - 1) **2 ) - sum( x[:-1] * x[1:] )
-
+@jit(target ="cuda")
 #...............................................................................
 def zakharov( x ):  # zakh.m
     x = np.asarray_chkfinite(x)
@@ -165,12 +180,13 @@ def zakharov( x ):  # zakh.m
 
 #...............................................................................
     # not in Hedar --
-
+@jit(target ="cuda")
 def ellipse( x ):
     x = np.asarray_chkfinite(x)
     return mean( (1 - x) **2 )  + 100 * mean( np.diff(x) **2 )
 
 #...............................................................................
+@jit(target ="cuda")
 def nesterov( x ):
     """ Nesterov's nonsmooth Chebyshev-Rosenbrock function, Overton 2011 variant 2 """
     x = np.asarray_chkfinite(x)
@@ -180,12 +196,15 @@ def nesterov( x ):
         + sum( abs( x1 - 2*abs(x0) + 1 ))
 
 #...............................................................................
+@jit(target ="cuda")
 def saddle( x ):
     x = np.asarray_chkfinite(x) - 1
     return np.mean( np.diff( x **2 )) \
         + .5 * np.mean( x **4 )
-        
+
+   
 #...............................................................................      
+@jit(target ="cuda")    
 def damavandi(x):
     # Range: [0,14] in each dimension
     # Global minimum at (2,2)
@@ -194,6 +213,7 @@ def damavandi(x):
     return ( 1 - abs( np.sin(y1)*np.sin(y2) / (y1*y2) )**5 ) * (2 + (x1-7)**2 + 2*(x2-7)**2)
 
 #...............................................................................  
+@jit(target ="cuda")
 def rotatedhyperellipsoid ( x ):
   f = np.zeros ( len(x) )
   outer = 0.0

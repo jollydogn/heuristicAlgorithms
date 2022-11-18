@@ -8,8 +8,10 @@ import random
 import numpy
 from solution import solution
 import time
+import numba as nb
+from numba import jit, cuda
 
-
+@jit(target ="cuda")
 def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter, decrease_From=2):
     ret_score=0
 
